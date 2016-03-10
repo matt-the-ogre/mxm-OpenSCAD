@@ -65,7 +65,7 @@ module GoProMount(baseHeight) {
        }
        translate([0,minimumBaseHeight + outsideDiameter,0]) rotate([0,90,0]) cylinder(h = 30, d = insideDiameter, center = true);
        // hex cutout for 1/4 20-pitch nut for tripod mount
-        translate([0,-baseHeight,0]) rotate([90,0,0]) hexagon(quarterTwentyNutRadius + slopValue,2);[ 0.00, 0.00, 0.00 ]
+        translate([0,-baseHeight,0]) rotate([90,0,0]) hexagon(quarterTwentyNutRadius + slopValue,2);
     }
 }
 
