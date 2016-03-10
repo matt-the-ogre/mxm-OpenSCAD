@@ -10,19 +10,30 @@ The above copyright notice and this permission notice shall be included in all c
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-// size is the XY plane size, height in Z
+use <hexagon-mxm.scad>
+
+$fs = 0.5;
+$fa = 3;
+slopValue = 0.2; // mm, suggested to be half the nozzle size of your printer
+// mount is oriented so "up" is along the y-axis
+// baseHeight starts at 0 on y-axis and goes negative
 module GoProMount(baseHeight) {
     outsideDiameter = 15; // mm
     insideDiameter = 5.5; // mm
-    minimumBaseHeight = 15; // mm
-    outsideProngWidth = 2.75; // mm
-    insideProngWidth = 3.15; // mm
+    minimumBaseHeight = 10; // mm
+    outsideProngWidth = 2.75 - slopValue; // mm
+    insideProngWidth = 3.15 - slopValue; // mm
+    quarterTwentyNutRadius = 12.55/2; //mm (for tripod mount)
+    
     difference() {
         union() {
-            translate([0,0,0]) cube([15.1,baseHeight + minimumBaseHeight,15], center = true);
+            hull() {
+                translate([0,-baseHeight/2,0]) cube([15.1,(baseHeight),15], center = true);
+                translate([0,minimumBaseHeight/2,0]) cube([15.1, minimumBaseHeight, 15], center = true);
+            }
             // leftProng;
             translate([15.1/2-outsideProngWidth/2,minimumBaseHeight,0]) hull() {
-                cube([2.75,outsideDiameter,15], center = true);
+                cube([outsideProngWidth,outsideDiameter,15], center = true);
                 translate([0,outsideDiameter,0]) rotate([0,90,0]) cylinder(h= 2.75, d = outsideDiameter, center = true);
             }
             // centerProng
@@ -35,8 +46,26 @@ module GoProMount(baseHeight) {
                 cube([outsideProngWidth,outsideDiameter,15], center = true);
                 translate([0,outsideDiameter,0]) rotate([0,90,0]) cylinder(h= outsideProngWidth, d = outsideDiameter, center = true);
             }
-        }
-        translate([0,minimumBaseHeight + outsideDiameter,0]) rotate([0,90,0]) cylinder(h = 30, d = insideDiameter, center = true);
+             translate([insideProngWidth/2+1.6,minimumBaseHeight+2.5,0]) {
+                difference() {
+                    cylinder(15,d = 8,center = true);
+                    cylinder(22,d = 4,center = true);
+                    translate([0,5,0]) cube([10,10,25],center = true);
+                }
+            }
+            
+            translate([-(insideProngWidth/2+1.6),minimumBaseHeight+2.5,0]) {
+                difference() {
+                    cylinder(15,d = 8,center = true);
+                    cylinder(22,d = 4,center = true);
+                    translate([0,5,0]) cube([10,10,25],center = true);
+                }
+            }
+    
+       }
+       translate([0,minimumBaseHeight + outsideDiameter,0]) rotate([0,90,0]) cylinder(h = 30, d = insideDiameter, center = true);
+       // hex cutout for 1/4 20-pitch nut for tripod mount
+        translate([0,-baseHeight,0]) rotate([90,0,0]) hexagon(quarterTwentyNutRadius + slopValue,2);[ 0.00, 0.00, 0.00 ]
     }
 }
 
